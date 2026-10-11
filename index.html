@@ -163,8 +163,6 @@
   </main>
 
   <script>
-    const supabaseUrl = 'https://ietshavvsbgpefkzrwgc.supabase.co';
-    const supabasePublishableKey = 'sb_publishable_cFRBKsCDEjq3wzlgbO7C0g_KQQdpw-A';
     const form = document.getElementById('loginForm');
     const status = document.getElementById('status');
     const password = document.getElementById('password');
@@ -188,12 +186,11 @@
       const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       try {
-        const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        const response = await fetch('/login', {
           method: 'POST',
           signal: controller.signal,
           headers: {
-            'Content-Type': 'application/json',
-            apikey: supabasePublishableKey
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({ email, password: passwordValue })
         });
