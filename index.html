@@ -163,10 +163,13 @@
   </main>
 
   <script>
+    const supabaseUrl = 'https://ietshavvsbgpefkzrwgc.supabase.co';
+    const supabasePublishableKey = 'sb_publishable_cFRBKsCDEjq3wzlgbO7C0g_KQQdpw-A';
     const form = document.getElementById('loginForm');
     const status = document.getElementById('status');
     const password = document.getElementById('password');
     const showPassword = document.getElementById('showPassword');
+    const submitButton = form.querySelector('button[type="submit"]');
 
     showPassword.addEventListener('change', () => {
       password.type = showPassword.checked ? 'text' : 'password';
@@ -176,16 +179,21 @@
       event.preventDefault();
 
       const email = document.getElementById('email').value.trim();
-      const passwordValue = password.value.trim();
+      const passwordValue = password.value;
 
       status.textContent = 'Signing in...';
       status.classList.remove('error');
+      submitButton.disabled = true;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       try {
-        const response = await fetch('/login', {
+        const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
           method: 'POST',
+          signal: controller.signal,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            apikey: supabasePublishableKey
           },
           body: JSON.stringify({ email, password: passwordValue })
         });
@@ -193,14 +201,19 @@
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.message || 'Login failed.');
+          throw new Error(result.msg || result.message || 'Unable to sign in. Check your email and password.');
         }
 
         sessionStorage.setItem('isLoggedIn', 'true');
         window.location.href = '/dashboard';
       } catch (error) {
-        status.textContent = error.message;
+        status.textContent = error.name === 'AbortError'
+          ? 'Supabase did not respond. Check your connection and try again.'
+          : error.message;
         status.classList.add('error');
+        submitButton.disabled = false;
+      } finally {
+        clearTimeout(timeoutId);
       }
     });
   </script>
