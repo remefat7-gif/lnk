@@ -2,7 +2,6 @@
   "name": "login-demo",
   "version": "1.0.0",
   "private": true,
-  "description": "Simple login flow with a backend and white dashboard page.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,6 +9,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^18.0.7",
     "express": "^4.19.2"
   },
   "devDependencies": {
